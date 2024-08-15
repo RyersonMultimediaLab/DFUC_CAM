@@ -11,8 +11,6 @@ Masked Autoencoder (MAE) training setup using the MMSelfSup library. It's design
 - [Configuration](#configuration)
 - [Key Components](#key-components)
 - [Customization](#customization)
-- [Contributing](#contributing)
-- [License](#license)
 - [Acknowledgments](#acknowledgments)
 - [Additional Resources](#additional-resources)
 
