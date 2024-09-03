@@ -15,7 +15,6 @@ print(f"Using device: {device}")
 
 def apply_realistic_augmentations(images, target_size=(224, 224)):
     try:
-        # Resize and convert to tensor, then move to GPU if available
         images = torch.stack([T.Compose([
             T.Resize(target_size),
             T.ToTensor()
@@ -141,14 +140,12 @@ def process_ulcer_dataset(input_folder, output_folder, num_augmentations=9, batc
                 except Exception as e:
                     print(f"Error processing image {input_path}: {str(e)}")
             
-            # Process the batch for augmentations
             augmented_images = apply_realistic_augmentations(batch_images * num_augmentations, target_size)
             
             if augmented_images is None:
                 print(f"Error: augmented_images is None for batch starting at index {i}")
                 continue
             
-            # Save the augmented images
             for j, (output_subfolder, file) in enumerate(batch_paths):
                 for k in range(num_augmentations):
                     idx = j * num_augmentations + k
@@ -160,13 +157,11 @@ def process_ulcer_dataset(input_folder, output_folder, num_augmentations=9, batc
                         print(f"augmented_images shape: {augmented_images.shape}")
                         print(f"idx: {idx}")
             
-            # Update and save checkpoint
             checkpoint['file_index'] = i + batch_size
             if (i + batch_size) % checkpoint_interval == 0:
                 with open(checkpoint_file, 'w') as f:
                     json.dump(checkpoint, f)
         
-        # Reset file index for next split
         checkpoint['split'] = 'val' if split == 'train' else 'completed'
         checkpoint['file_index'] = 0
         with open(checkpoint_file, 'w') as f:

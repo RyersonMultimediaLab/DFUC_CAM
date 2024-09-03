@@ -20,10 +20,9 @@ validation_dir = '/validation/images'
 validation_mask_dir = '/validation/mask'
 new_heatmap_dir = '/heatmap/output'
 
-# Ensure output directory exists
 os.makedirs(new_heatmap_dir, exist_ok=True)
 
-# Check for GPU availability
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"Using device: {device}")
 
@@ -100,7 +99,7 @@ def load_and_preprocess_validation_data(validation_dir, validation_mask_dir):
             img = cv2.imread(img_path)
             img = cv2.resize(img, (model_config["input_size"], model_config["input_size"]))
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            img = img.transpose(2, 0, 1) / 255.0  # Convert to CHW format and normalize
+            img = img.transpose(2, 0, 1) / 255.0 
 
             mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
             mask = cv2.resize(mask, (model_config["input_size"], model_config["input_size"]))
@@ -124,7 +123,7 @@ def iou_score(pred, target):
 
 def evaluate_heatmap(heatmap, ground_truth, threshold=0.5):
     binary_heatmap = (heatmap > threshold).astype(np.float32)
-    dilated_heatmap = binary_dilation(binary_heatmap, iterations=5)  # Adjust iterations as needed
+    dilated_heatmap = binary_dilation(binary_heatmap, iterations=5)  
 
     dice = dice_score(dilated_heatmap, ground_truth)
     iou = iou_score(dilated_heatmap, ground_truth)
@@ -161,7 +160,7 @@ def generate_and_evaluate_heatmaps(model, validation_images, validation_masks, l
         dice_scores.append(dice)
         iou_scores.append(iou)
 
-        # Plot heatmap
+       
         axs[idx, 0].imshow(img.transpose(1, 2, 0))
         axs[idx, 0].set_title(f'Original Image {idx+1}')
         axs[idx, 0].axis('off')
@@ -177,25 +176,22 @@ def generate_and_evaluate_heatmaps(model, validation_images, validation_masks, l
 
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 
-    # Create directory for this model and method
+    
     model_method_dir = os.path.join(new_heatmap_dir, f"{model_filename}_{localization_method}")
     os.makedirs(model_method_dir, exist_ok=True)
 
-    # Save the plot
+    
     plt.savefig(os.path.join(model_method_dir, 'heatmaps.png'))
     plt.close()
 
     return np.mean(dice_scores), np.mean(iou_scores)
 
-# Load validation data
 print("Loading validation data...")
 validation_images, validation_masks = load_and_preprocess_validation_data(validation_dir, validation_mask_dir)
 print(f"Loaded {len(validation_images)} validation images and masks.")
-# Limit to 10 images
 validation_images = validation_images[:10]
 validation_masks = validation_masks[:10]
 
-# Main execution
 model_files = glob.glob(os.path.join(models_dir, "*.pth"))
 results = []
 
@@ -227,13 +223,11 @@ for model_file in model_files:
         })
         print(f"    {model_filename} - {method}: Mean Dice = {mean_dice:.4f}, Mean IoU = {mean_iou:.4f}")
 
-# Sort and display results
 results.sort(key=lambda x: x['mean_dice'], reverse=True)
 print("\nFinal Results (sorted by Mean Dice):")
 for result in results:
     print(f"{result['model']} - {result['method']}: Mean Dice = {result['mean_dice']:.4f}, Mean IoU = {result['mean_iou']:.4f}")
 
-# Save results to CSV
 csv_filename = os.path.join(new_heatmap_dir, 'heatmap_evaluation_results.csv')
 with open(csv_filename, 'w', newline='') as file:
     writer = csv.DictWriter(file, fieldnames=['model', 'method', 'mean_dice', 'mean_iou'])

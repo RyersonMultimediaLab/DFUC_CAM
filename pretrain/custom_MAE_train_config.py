@@ -19,7 +19,7 @@ train_pipeline = [
 ]
 
 
-# dataset 8 x 512
+# dataset 2 x 32
 train_dataloader = dict(
     batch_size=32,     #change the batch_size and num_worker according to your hardware
     num_workers=2,
