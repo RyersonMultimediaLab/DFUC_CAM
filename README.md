@@ -11,7 +11,7 @@
 - [Introduction](#introduction)
 - [Features](#features)
 - [Methodology](#methodology)
-  - [1. CAM generation](#1-pseudo-label-generation)
+  - [1. CAM generation](#1-cam-generation)
   - [2. Self-Supervised Learning](#2-self-supervised-learning)
   - [3. Fine-tuning for Segmentation](#3-fine-tuning-for-segmentation)
 - [Installation](#installation)
